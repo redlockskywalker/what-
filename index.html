@@ -2,30 +2,753 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>СПАСИБО!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Тайны Древнего Криптекса</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <style>
+        :root {
+            --bg-dark: #07050a;
+            --card-bg: rgba(18, 14, 28, 0.88);
+            --accent-gold: #ffd700;
+            --accent-pink: #ff2a75;
+            --accent-purple: #9d4edd;
+            --accent-cyan: #00f2fe;
+            --text-main: #f3f0ff;
+            --border-glow: rgba(157, 78, 221, 0.35);
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
         }
+
         body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background-color: #07050a;
-            color: #ffffff;
-            font-family: 'Montserrat', sans-serif, Arial;
-            font-size: 3rem;
-            font-weight: bold;
-            letter-spacing: 2px;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(157, 78, 221, 0.25) 0%, transparent 65%),
+                radial-gradient(circle at 50% 100%, rgba(255, 42, 117, 0.2) 0%, transparent 70%),
+                radial-gradient(circle at 0% 50%, rgba(0, 242, 254, 0.1) 0%, transparent 50%);
+        }
+
+        /* Защитное размытие при потере фокуса */
+        body.protected-blur .iphone-frame {
+            filter: blur(40px) brightness(0.2);
+            pointer-events: none;
+        }
+
+        .iphone-frame {
+            width: 100%;
+            max-width: 430px;
+            height: 100vh;
+            max-height: 932px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding: calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px) 16px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.95);
+            overflow: hidden;
+            background: rgba(8, 6, 12, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: filter 0.2s ease;
+        }
+
+        @media (min-height: 700px) and (min-width: 440px) {
+            .iphone-frame {
+                border-radius: 44px;
+                height: 92vh;
+            }
+        }
+
+        .header-title {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 2.5px;
+            background: linear-gradient(135deg, var(--accent-gold), #fff8d0, var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .step-dot {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 2px;
+            transition: all 0.4s ease;
+        }
+
+        .step-dot.active {
+            background: var(--accent-pink);
+            box-shadow: 0 0 10px var(--accent-pink);
+        }
+
+        .step-dot.completed {
+            background: var(--accent-gold);
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+        }
+
+        .stage-box {
+            display: none;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
+            background: var(--card-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 24px;
+            padding: 20px 16px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7);
+            animation: slideUpFade 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            width: 100%;
+            max-height: 100%;
+            overflow-y: auto;
+        }
+
+        .stage-box.active { display: flex; }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(18px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .glow-input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(157, 78, 221, 0.4);
+            border-radius: 14px;
+            color: #fff;
+            font-size: 15px;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
+        .glow-input:focus {
+            border-color: var(--accent-pink);
+            box-shadow: 0 0 15px rgba(255, 42, 117, 0.35);
+        }
+
+        .btn-gold {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255, 42, 117, 0.4);
+            transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .btn-gold:active { transform: scale(0.97); }
+        .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        .error-msg {
+            color: #ff4d6d;
+            font-size: 12px;
+            margin-top: 8px;
+            min-height: 18px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-weight: 600;
+        }
+
+        .error-msg.show { opacity: 1; }
+
+        .cryptex-container {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 10px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cryptex-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 215, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+        }
+
+        .wheel-wrapper {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 10px auto 15px auto;
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-top: 26px solid var(--accent-gold);
+            z-index: 20;
+        }
+
+        canvas#wheelCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(157, 78, 221, 0.5);
+        }
+
+        .signal-light {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #1a1528;
+            border: 2px solid rgba(255,255,255,0.2);
+            transition: background-color 0.05s, box-shadow 0.05s;
+        }
+
+        .signal-light.active {
+            background: var(--accent-cyan);
+            box-shadow: 0 0 25px var(--accent-cyan), 0 0 50px var(--accent-cyan);
         }
     </style>
 </head>
 <body>
-    СПАСИБО!
+
+<div class="iphone-frame" id="appFrame">
+    <!-- Header Navigation & Progress -->
+    <div class="w-full text-center mb-3">
+        <h1 class="header-title font-extrabold text-xl mb-2 uppercase">Тайны Древнего Криптекса</h1>
+        <div class="grid grid-cols-5 gap-1 px-2">
+            <div class="step-dot active" id="dot-1"></div>
+            <div class="step-dot" id="dot-2"></div>
+            <div class="step-dot" id="dot-3"></div>
+            <div class="step-dot" id="dot-4"></div>
+            <div class="step-dot" id="dot-5"></div>
+        </div>
+    </div>
+
+    <!-- Main Container for Dynamic Stages -->
+    <div class="flex-1 relative flex flex-col justify-center overflow-hidden">
+
+        <!-- STAGE 1: Шифр Виженера -->
+        <div class="stage-box active" id="stage-1">
+            <div class="flex items-center gap-2 mb-1 text-yellow-400 font-semibold text-sm">
+                <span>🗝️</span><span>ЭТАП I из IV</span>
+            </div>
+            <h2 class="text-lg font-bold text-white mb-2">Шифр Тьмы и Главное Слово</h2>
+            <p class="text-xs text-gray-300 mb-3 leading-relaxed">
+                Разгадай шифрограмму и введи вопрос-признание с вопросительным знаком на конце.
+            </p>
+
+            <div class="bg-black/60 border border-yellow-500/30 rounded-xl p-3 w-full mb-3 text-left">
+                <p class="text-xs text-yellow-300 italic mb-2">
+                    "Ночное небесное светило, что управляет приливами океана..." (Ключ)
+                </p>
+                <div class="text-[11px] text-gray-400">
+                    🔒 Шифровка: <span class="text-pink-400 font-bold tracking-wider">ЮОЪО КЯЛБ ЪХЙ?</span>
+                </div>
+            </div>
+
+            <div class="w-full space-y-2 mb-2">
+                <input type="text" class="glow-input" id="answer-1" placeholder="Введите расшифрованный вопрос..." autocomplete="off">
+                <div class="error-msg" id="err-1">Неверно! Проверь каждую букву и знак.</div>
+            </div>
+
+            <button class="btn-gold" onclick="checkStage1()">ПОДТВЕРДИТЬ</button>
+        </div>
+
+        <!-- STAGE 2: Магический Сейф -->
+        <div class="stage-box" id="stage-2">
+            <div class="flex items-center gap-2 mb-1 text-yellow-400 font-semibold text-sm">
+                <span>🔐</span><span>ЭТАП II из IV</span>
+            </div>
+            <h2 class="text-lg font-bold text-white mb-1">Магический Квадрат Сейфа</h2>
+            <p class="text-xs text-gray-300 mb-3 leading-relaxed">
+                В древнем квадрате сумма чисел во всех направлениях равна <b>15</b>. Подбери значения [A, B, C, D].
+            </p>
+
+            <div class="grid grid-cols-3 gap-2 w-48 mb-4">
+                <div class="bg-purple-900/40 border border-yellow-500/40 rounded-lg h-12 flex items-center justify-center font-bold text-yellow-300 text-lg">A</div>
+                <div class="bg-black/50 border border-white/10 rounded-lg h-12 flex items-center justify-center font-bold text-white text-lg">1</div>
+                <div class="bg-black/50 border border-white/10 rounded-lg h-12 flex items-center justify-center font-bold text-white text-lg">6</div>
+
+                <div class="bg-black/50 border border-white/10 rounded-lg h-12 flex items-center justify-center font-bold text-white text-lg">3</div>
+                <div class="bg-purple-900/40 border border-yellow-500/40 rounded-lg h-12 flex items-center justify-center font-bold text-yellow-300 text-lg">B</div>
+                <div class="bg-black/50 border border-white/10 rounded-lg h-12 flex items-center justify-center font-bold text-white text-lg">7</div>
+
+                <div class="bg-black/50 border border-white/10 rounded-lg h-12 flex items-center justify-center font-bold text-white text-lg">4</div>
+                <div class="bg-purple-900/40 border border-yellow-500/40 rounded-lg h-12 flex items-center justify-center font-bold text-yellow-300 text-lg">C</div>
+                <div class="bg-purple-900/40 border border-yellow-500/40 rounded-lg h-12 flex items-center justify-center font-bold text-yellow-300 text-lg">D</div>
+            </div>
+
+            <div class="flex justify-center gap-2 mb-3">
+                <div class="flex flex-col items-center">
+                    <span class="text-[10px] text-gray-400 mb-1">A</span>
+                    <button class="w-10 h-7 bg-purple-800/60 rounded-t text-white font-bold" onclick="adjustDigit('A', 1)">▲</button>
+                    <div class="w-10 h-10 bg-black border border-pink-500 flex items-center justify-center text-xl font-bold text-yellow-400" id="digit-A">0</div>
+                    <button class="w-10 h-7 bg-purple-800/60 rounded-b text-white font-bold" onclick="adjustDigit('A', -1)">▼</button>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-[10px] text-gray-400 mb-1">B</span>
+                    <button class="w-10 h-7 bg-purple-800/60 rounded-t text-white font-bold" onclick="adjustDigit('B', 1)">▲</button>
+                    <div class="w-10 h-10 bg-black border border-pink-500 flex items-center justify-center text-xl font-bold text-yellow-400" id="digit-B">0</div>
+                    <button class="w-10 h-7 bg-purple-800/60 rounded-b text-white font-bold" onclick="adjustDigit('B', -1)">▼</button>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-[10px] text-gray-400 mb-1">C</span>
+                    <button class="w-10 h-7 bg-purple-800/60 rounded-t text-white font-bold" onclick="adjustDigit('C', 1)">▲</button>
+                    <div class="w-10 h-10 bg-black border border-pink-500 flex items-center justify-center text-xl font-bold text-yellow-400" id="digit-C">0</div>
+                    <button class="w-10 h-7 bg-purple-800/60 rounded-b text-white font-bold" onclick="adjustDigit('C', -1)">▼</button>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-[10px] text-gray-400 mb-1">D</span>
+                    <button class="w-10 h-7 bg-purple-800/60 rounded-t text-white font-bold" onclick="adjustDigit('D', 1)">▲</button>
+                    <div class="w-10 h-10 bg-black border border-pink-500 flex items-center justify-center text-xl font-bold text-yellow-400" id="digit-D">0</div>
+                    <button class="w-10 h-7 bg-purple-800/60 rounded-b text-white font-bold" onclick="adjustDigit('D', -1)">▼</button>
+                </div>
+            </div>
+
+            <div class="error-msg" id="err-2">Неверная комбинация!</div>
+            <button class="btn-gold" onclick="checkStage2()">ОТКРЫТЬ СЕЙФ</button>
+        </div>
+
+        <!-- STAGE 3: Частотный Декодер (Морзе для слова ОБМАН) -->
+        <div class="stage-box" id="stage-3">
+            <div class="flex items-center gap-2 mb-1 text-yellow-400 font-semibold text-sm">
+                <span>📻</span><span>ЭТАП III из IV</span>
+            </div>
+            <h2 class="text-lg font-bold text-white mb-1">Частотный Декодер</h2>
+            <p class="text-[11px] text-gray-300 mb-2 leading-tight">
+                Настрой радиоприёмник на частоту <b>104.7 FM</b>. Послушай световой сигнал и введи разгаданное слово.
+            </p>
+
+            <div class="w-full bg-black/60 p-3 rounded-xl border border-cyan-500/30 mb-3 flex flex-col items-center">
+                <div class="text-xs text-cyan-300 font-mono mb-1">ЧАСТОТА: <span id="freqDisplay" class="font-bold text-yellow-400">88.0</span> MHz</div>
+                <input type="range" min="88.0" max="108.0" step="0.1" value="88.0" class="w-full accent-cyan-400 cursor-pointer" id="freqSlider" oninput="updateFrequency(this.value)">
+            </div>
+
+            <div class="flex items-center justify-center gap-4 mb-3 w-full">
+                <div class="signal-light" id="morseLight"></div>
+                <button class="px-4 py-2 bg-cyan-900/60 border border-cyan-400 text-cyan-200 text-xs rounded-lg font-semibold" id="playMorseBtn" disabled onclick="playMorseSequence()">
+                    ▶ ВОСПРОИЗВЕСТИ СИГНАЛ
+                </button>
+            </div>
+
+            <!-- Шпаргалка Морзе для ОБМАН -->
+            <div class="bg-black/40 border border-white/10 rounded-lg p-2 w-full text-[10px] text-gray-300 mb-3 grid grid-cols-5 gap-1 text-center font-mono">
+                <div>О: ---</div>
+                <div>Б: -•••</div>
+                <div>М: --</div>
+                <div>А: •-</div>
+                <div>Н: -•</div>
+            </div>
+
+            <div class="w-full space-y-2 mb-2">
+                <input type="text" class="glow-input" id="answer-3" placeholder="Введите слово..." autocomplete="off">
+                <div class="error-msg" id="err-3">Слово неверно!</div>
+            </div>
+
+            <button class="btn-gold" onclick="checkStage3()">ПРИНЯТЬ СИГНАЛ</button>
+        </div>
+
+        <!-- STAGE 4: Древний Криптекс -->
+        <div class="stage-box" id="stage-4">
+            <div class="flex items-center gap-2 mb-1 text-yellow-400 font-semibold text-sm">
+                <span>🔮</span><span>ФИНАЛЬНЫЙ ЭТАП IV</span>
+            </div>
+            <h2 class="text-lg font-bold text-white mb-1">Древний Криптекс</h2>
+            <p class="text-[11px] text-gray-300 mb-2 leading-tight">
+                Сопоставь символы стихов в одну линию по центру:
+            </p>
+
+            <div class="bg-black/50 border border-purple-500/30 rounded-xl p-2.5 w-full mb-2 text-left text-[10px] text-purple-200 leading-tight space-y-1">
+                <p>1️⃣ Внешнее: <i>"Пламя, сжигающее любые сомнения"</i> (🔥)</p>
+                <p>2️⃣ Среднее: <i>"Полная луна в тишине ночи"</i> (🌕)</p>
+                <p>3️⃣ Внутреннее: <i>"Ключ от заветных тайн"</i> (🔑)</p>
+            </div>
+
+            <div class="cryptex-container">
+                <div class="cryptex-ring w-[210px] h-[210px]" id="ring-1" onclick="rotateRing(1)">
+                    <span class="absolute top-2 text-xl">🔥</span>
+                    <span class="absolute right-2 text-xl">💧</span>
+                    <span class="absolute bottom-2 text-xl">⚡</span>
+                    <span class="absolute left-2 text-xl">🌱</span>
+                </div>
+                <div class="cryptex-ring w-[140px] h-[140px] border-pink-500/50" id="ring-2" onclick="rotateRing(2)">
+                    <span class="absolute top-2 text-lg">☀️</span>
+                    <span class="absolute right-2 text-lg">🌕</span>
+                    <span class="absolute bottom-2 text-lg">⭐</span>
+                    <span class="absolute left-2 text-lg">🪐</span>
+                </div>
+                <div class="cryptex-ring w-[70px] h-[70px] border-cyan-400/60" id="ring-3" onclick="rotateRing(3)">
+                    <span class="absolute top-1 text-base">👁️</span>
+                    <span class="absolute right-1 text-base">👑</span>
+                    <span class="absolute bottom-1 text-base">🔑</span>
+                    <span class="absolute left-1 text-base">💎</span>
+                </div>
+            </div>
+
+            <div class="error-msg" id="err-4">Символы не совпадают!</div>
+            <button class="btn-gold mt-2" onclick="checkStage4()">ОТКРЫТЬ КРИПТЕКС</button>
+        </div>
+
+        <!-- STAGE 5: Награда -->
+        <div class="stage-box" id="stage-5">
+            <div class="flex items-center gap-2 mb-1 text-yellow-400 font-semibold text-sm">
+                <span>🎁</span><span>ФИНАЛ</span>
+            </div>
+            <h2 class="text-xl font-extrabold text-white mb-1">Колесо Фортуны</h2>
+            <p class="text-xs text-gray-300 mb-2 leading-relaxed">
+                Ты прошла испытания честно и без подсказок ИИ!
+            </p>
+
+            <div class="wheel-wrapper">
+                <div class="wheel-pointer"></div>
+                <canvas id="wheelCanvas" width="280" height="280"></canvas>
+            </div>
+
+            <button class="btn-gold" id="spinBtn" onclick="spinWheel()">ВРАЩАТЬ БАРАБАН</button>
+        </div>
+
+    </div>
+
+    <!-- WIN MODAL OVERLAY -->
+    <div id="winModal" class="hidden fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-6 text-center">
+        <div class="bg-gradient-to-b from-purple-950 to-gray-950 border-2 border-yellow-400/80 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative">
+            <div class="text-4xl mb-2">🎉✨</div>
+            <h2 class="font-serif text-2xl font-bold text-yellow-300 mb-2">ПОЗДРАВЛЯЕМ!</h2>
+            <p class="text-xs text-gray-300 mb-4">Все зашифрованные секреты разгаданы твоим собственным умом!</p>
+
+            <div class="bg-pink-950/50 border border-pink-500/50 rounded-2xl p-4 mb-5">
+                <div class="text-[11px] text-pink-300 uppercase tracking-widest font-semibold mb-1">Твой гарантированный подарок:</div>
+                <div class="text-lg font-bold text-white" id="prizeDisplay">...</div>
+            </div>
+
+            <button class="btn-gold" onclick="location.reload()">ПРОЙТИ СНОВА</button>
+        </div>
+    </div>
+
+    <!-- ANTI-CHEAT MODAL (Всплывает при скриншоте/переключении) -->
+    <div id="cheatModal" class="hidden fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-6 text-center">
+        <div class="bg-gradient-to-b from-red-950 via-purple-950 to-gray-950 border-2 border-pink-500 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative">
+            <div class="text-5xl mb-3">🙈💔</div>
+            <h2 class="font-serif text-xl font-bold text-pink-400 mb-3">Опять жульничаешь?</h2>
+            <p class="text-xs text-gray-200 leading-relaxed mb-6 font-medium">
+                Разве столько строчек кода не стоили твоего внимания, что ты решила обратиться за помощью к ИИ?
+            </p>
+            <button class="btn-gold" onclick="closeCheatModal()">Буду решать сама! ❤️</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* ===================================================
+       ОСНОВНОЙ КОНФИГ И ЗАКРЫТЫЕ ХЕШИ
+    =================================================== */
+    const GAME_CONFIG = {
+        // "ты моя любовь?" (без пробелов, нижний регистр)
+        stage1Answer: "тымоялюбовь?",
+        // Код сейфа
+        stage2Code: "8592",
+        // Слово морзе "обман"
+        stage3Answer: "обман",
+        
+        winningIndex: 0,
+        prizes: [
+            "🌸 SPA-набор премиум ухода",
+            "💄 Бьюти-бокс: Элитный уход за кожей",
+            "💇‍♀️ Премиум стайлер для волос",
+            "✨ Набор парфюмерных масел",
+            "🌿 Органический бокс ухода",
+            "🎁 Секретный Бьюти-сюрприз"
+        ]
+    };
+
+    let currentStage = 1;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playBeep(freq = 600, duration = 0.1, type = 'sine') {
+        try {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
+    }
+
+    function nextStage(stageNum) {
+        document.querySelectorAll('.stage-box').forEach(el => el.classList.remove('active'));
+        document.getElementById(`stage-${stageNum}`).classList.add('active');
+
+        document.getElementById(`dot-${currentStage}`).classList.remove('active');
+        document.getElementById(`dot-${currentStage}`).classList.add('completed');
+        currentStage = stageNum;
+        document.getElementById(`dot-${currentStage}`).classList.add('active');
+
+        playBeep(880, 0.2, 'triangle');
+        if (stageNum === 5) drawWheel();
+    }
+
+    /* ===================================================
+       АНТИ-ЧИТ И АНТИ-СКРИНШОТ СИСТЕМА
+    =================================================== */
+    function showCheatModal() {
+        document.body.classList.add('protected-blur');
+        document.getElementById('cheatModal').classList.remove('hidden');
+        playBeep(180, 0.4, 'sawtooth');
+    }
+
+    function closeCheatModal() {
+        document.body.classList.remove('protected-blur');
+        document.getElementById('cheatModal').classList.add('hidden');
+    }
+
+    // 1. Детекция смены вкладок / сворачивания (Скриншот или отправка в ИИ на телефоне)
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            showCheatModal();
+        }
+    });
+
+    window.addEventListener('blur', () => {
+        showCheatModal();
+    });
+
+    // 2. Блокировка горячих клавиш скриншотов и инспектора кода
+    window.addEventListener('keydown', (e) => {
+        if (
+            e.key === 'PrintScreen' || 
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'S' || e.key === 's')) ||
+            (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 'p' || e.key === 'P')) ||
+            (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4' || e.key === '5'))
+        ) {
+            e.preventDefault();
+            showCheatModal();
+        }
+    });
+
+    // 3. Блокировка контекстного меню и копирования
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('copy', e => {
+        e.preventDefault();
+        showCheatModal();
+    });
+
+    /* ===================================================
+       ПРОВЕРКА ЭТАПОВ
+    =================================================== */
+    // Этап 1
+    function checkStage1() {
+        const val = document.getElementById('answer-1').value.trim().toLowerCase().replace(/\s+/g, '');
+        const err = document.getElementById('err-1');
+
+        if (val === GAME_CONFIG.stage1Answer) {
+            err.classList.remove('show');
+            nextStage(2);
+        } else {
+            err.classList.add('show');
+            playBeep(220, 0.25, 'sawtooth');
+        }
+    }
+
+    // Этап 2: Сейф
+    const codeLock = { A: 0, B: 0, C: 0, D: 0 };
+    function adjustDigit(key, delta) {
+        codeLock[key] = (codeLock[key] + delta + 10) % 10;
+        document.getElementById(`digit-${key}`).innerText = codeLock[key];
+        playBeep(400, 0.05);
+    }
+
+    function checkStage2() {
+        const currentCode = `${codeLock.A}${codeLock.B}${codeLock.C}${codeLock.D}`;
+        const err = document.getElementById('err-2');
+
+        if (currentCode === GAME_CONFIG.stage2Code) {
+            err.classList.remove('show');
+            nextStage(3);
+        } else {
+            err.classList.add('show');
+            playBeep(200, 0.3, 'sawtooth');
+        }
+    }
+
+    // Этап 3: Морзе (Слово ОБМАН)
+    function updateFrequency(val) {
+        document.getElementById('freqDisplay').innerText = parseFloat(val).toFixed(1);
+        const playBtn = document.getElementById('playMorseBtn');
+        if (Math.abs(parseFloat(val) - 104.7) < 0.15) {
+            playBtn.disabled = false;
+            playBtn.classList.add('animate-pulse', 'border-yellow-400');
+        } else {
+            playBtn.disabled = true;
+            playBtn.classList.remove('animate-pulse', 'border-yellow-400');
+        }
+    }
+
+    let isPlayingMorse = false;
+    async function playMorseSequence() {
+        if (isPlayingMorse) return;
+        isPlayingMorse = true;
+
+        const light = document.getElementById('morseLight');
+        // О(---), Б(-•••), М(--), А(•-), Н(-•)
+        const sequence = [
+            { type: 'dash' }, { type: 'dash' }, { type: 'dash' }, { type: 'pauseWord' }, // О
+            { type: 'dash' }, { type: 'dot' }, { type: 'dot' }, { type: 'dot' }, { type: 'pauseWord' }, // Б
+            { type: 'dash' }, { type: 'dash' }, { type: 'pauseWord' }, // М
+            { type: 'dot' }, { type: 'dash' }, { type: 'pauseWord' }, // А
+            { type: 'dash' }, { type: 'dot' } // Н
+        ];
+
+        for (const item of sequence) {
+            if (item.type === 'pauseWord') {
+                await new Promise(r => setTimeout(r, 400));
+            } else {
+                const duration = item.type === 'dash' ? 350 : 120;
+                light.classList.add('active');
+                playBeep(750, duration / 1000, 'sine');
+                await new Promise(r => setTimeout(r, duration));
+                light.classList.remove('active');
+                await new Promise(r => setTimeout(r, 120));
+            }
+        }
+        isPlayingMorse = false;
+    }
+
+    function checkStage3() {
+        const val = document.getElementById('answer-3').value.trim().toLowerCase();
+        const err = document.getElementById('err-3');
+
+        if (val === GAME_CONFIG.stage3Answer) {
+            err.classList.remove('show');
+            nextStage(4);
+        } else {
+            err.classList.add('show');
+            playBeep(200, 0.3, 'sawtooth');
+        }
+    }
+
+    // Этап 4: Криптекс
+    const ringAngles = { 1: 0, 2: 0, 3: 0 };
+    function rotateRing(ringNum) {
+        ringAngles[ringNum] = (ringAngles[ringNum] + 90) % 360;
+        document.getElementById(`ring-${ringNum}`).style.transform = `rotate(${ringAngles[ringNum]}deg)`;
+        playBeep(350 + ringNum * 100, 0.08);
+    }
+
+    function checkStage4() {
+        const err = document.getElementById('err-4');
+        if (ringAngles[1] % 360 === 0 && ringAngles[2] % 360 === 270 && ringAngles[3] % 360 === 180) {
+            err.classList.remove('show');
+            nextStage(5);
+        } else {
+            err.classList.add('show');
+            playBeep(200, 0.3, 'sawtooth');
+        }
+    }
+
+    // Этап 5: Колесо
+    const wheelCanvas = document.getElementById('wheelCanvas');
+    const wheelCtx = wheelCanvas.getContext('2d');
+    const wheelColors = ['#ff2a75', '#9d4edd', '#3a0ca3', '#4cc9f0', '#f72585', '#7209b7'];
+
+    function drawWheel() {
+        const numPrizes = GAME_CONFIG.prizes.length;
+        const arc = (2 * Math.PI) / numPrizes;
+        wheelCtx.clearRect(0, 0, 280, 280);
+
+        for (let i = 0; i < numPrizes; i++) {
+            const angle = i * arc;
+            wheelCtx.beginPath();
+            wheelCtx.fillStyle = wheelColors[i % wheelColors.length];
+            wheelCtx.moveTo(140, 140);
+            wheelCtx.arc(140, 140, 130, angle, angle + arc);
+            wheelCtx.lineTo(140, 140);
+            wheelCtx.fill();
+
+            wheelCtx.save();
+            wheelCtx.fillStyle = "#ffffff";
+            wheelCtx.translate(140 + Math.cos(angle + arc / 2) * 85, 140 + Math.sin(angle + arc / 2) * 85);
+            wheelCtx.rotate(angle + arc / 2 + Math.PI / 2);
+            wheelCtx.font = "bold 9px Montserrat";
+            wheelCtx.textAlign = "center";
+            const text = GAME_CONFIG.prizes[i];
+            wheelCtx.fillText(text.length > 20 ? text.substring(0, 18) + "..." : text, 0, 0);
+            wheelCtx.restore();
+        }
+    }
+
+    let isWheelSpinning = false;
+    function spinWheel() {
+        if (isWheelSpinning) return;
+        isWheelSpinning = true;
+
+        document.getElementById('spinBtn').disabled = true;
+        const numPrizes = GAME_CONFIG.prizes.length;
+        const segmentAngle = 360 / numPrizes;
+        const targetIndex = GAME_CONFIG.winningIndex;
+        const targetAngle = 360 - (targetIndex * segmentAngle) - (segmentAngle / 2) - 90;
+        const totalRotation = (360 * 5) + targetAngle;
+
+        let start = null;
+        function animateWheel(timestamp) {
+            if (!start) start = timestamp;
+            const progress = (timestamp - start) / 4500;
+
+            if (progress < 1) {
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const currentAngle = eased * totalRotation;
+                wheelCanvas.style.transform = `rotate(${currentAngle}deg)`;
+                requestAnimationFrame(animateWheel);
+            } else {
+                wheelCanvas.style.transform = `rotate(${totalRotation}deg)`;
+                showWinModal();
+            }
+        }
+        requestAnimationFrame(animateWheel);
+    }
+
+    function showWinModal() {
+        document.getElementById('prizeDisplay').innerText = GAME_CONFIG.prizes[GAME_CONFIG.winningIndex];
+        setTimeout(() => {
+            document.getElementById('winModal').classList.remove('hidden');
+            confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+        }, 600);
+    }
+</script>
 </body>
 </html>
